@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 3.10)  # Or higher
 
 ####
 # Set project variables
-if(NOT DEFINED DFA_MLIR _VERSION_MAJOR)
-  set(DFA_MLIR _VERSION_MAJOR 0)
+if(NOT DEFINED DFA_MLIR_VERSION_MAJOR)
+  set(DFA_MLIR_VERSION_MAJOR 0)
 endif()
-if(NOT DEFINED DFA_MLIR _VERSION_MINOR)
-  set(DFA_MLIR _VERSION_MINOR 1)
+if(NOT DEFINED DFA_MLIR_VERSION_MINOR)
+  set(DFA_MLIR_VERSION_MINOR 1)
 endif()
-if(NOT DEFINED DFA_MLIR _VERSION_PATCH)
-  set(DFA_MLIR _VERSION_PATCH 1)
+if(NOT DEFINED DFA_MLIR_VERSION_PATCH)
+  set(DFA_MLIR_VERSION_PATCH 1)
 endif()
 
 cmake_policy(SET CMP0048 NEW) # The project() command manages VERSION variables
@@ -17,7 +17,7 @@ cmake_policy(SET CMP0077 NEW) # option() honors normal variables
 
 project(domain_flow_mlir
 	DESCRIPTION "Domain Flow MLIR-based parallelizing compiler"
-	VERSION "${DFA_MLIR _VERSION_MAJOR}.${DFA_MLIR _VERSION_MINOR}.${DFA_MLIR _VERSION_PATCH}" 
+	VERSION "${DFA_MLIR_VERSION_MAJOR}.${DFA_MLIR_VERSION_MINOR}.${DFA_MLIR_VERSION_PATCH}" 
 	LANGUAGES C CXX ASM
 	HOMEPAGE_URL "https://github.com/branes-ai/domain_flow_mlir")
 
@@ -31,10 +31,10 @@ set(CMAKE_CXX_STANDARD 20)  # Or 14, 17, 20, 23, etc.
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message(STATUS "C++20 has been enabled by default")
 
-set(DFA_MLIR _ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+set(DFA_MLIR_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-option(DFA_MLIR _USE_FOLDERS "Enable solution folders in Visual Studio, disable for Express"   ON)
-if (DFA_MLIR _USE_FOLDERS) 
+option(DFA_MLIR_USE_FOLDERS "Enable solution folders in Visual Studio, disable for Express"   ON)
+if (DFA_MLIR_USE_FOLDERS) 
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif()
 
@@ -46,16 +46,16 @@ message(STATUS "PROJECT_NAME = ${PROJECT_NAME}")
 
 ####
 # Set environmental options for tracing, testing, and verbosity
-option(DFA_MLIR _CMAKE_TRACE "Tracing CMake results, i.e. printing variable settings." OFF)
-option(DFA_MLIR _ENABLE_TESTS "Enable the build and run of tests." ON)
-option(DFA_MLIR _VERBOSE_TESTS "Always print test output, otherwise only errors. Only relevant when tests enabled." OFF)
+option(DFA_MLIR_CMAKE_TRACE "Tracing CMake results, i.e. printing variable settings." OFF)
+option(DFA_MLIR_ENABLE_TESTS "Enable the build and run of tests." ON)
+option(DFA_MLIR_VERBOSE_TESTS "Always print test output, otherwise only errors. Only relevant when tests enabled." OFF)
 
 # Set the toolchain directory
 #set(CMAKE_TOOLCHAIN_FILE "C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Path to the vcpkg.cmake")
 #better set through the CMakePreset mechanism
 
 # Must be located in root dir, doesn't work in tests
-if (DFA_MLIR _ENABLE_TESTS)
+if (DFA_MLIR_ENABLE_TESTS)
     enable_testing()
     # include(Dart)
 endif()
@@ -65,7 +65,7 @@ endif()
 include_directories("./include")
 
 macro(trace_variable variable)
-    if (DFA_MLIR _CMAKE_TRACE)
+    if (DFA_MLIR_CMAKE_TRACE)
         message(STATUS "${variable} = ${${variable}}")
     endif()
 endmacro()
@@ -87,7 +87,7 @@ macro (compile_all testing prefix folder)
         #add_custom_target(valid SOURCES ${SOURCES})
         set_target_properties(${test_name} PROPERTIES FOLDER ${folder})
         if (${testing} STREQUAL "true")
-            if (DFA_MLIR _CMAKE_TRACE)
+            if (DFA_MLIR_CMAKE_TRACE)
                 message(STATUS "testing: ${test_name} ${RUNTIME_OUTPUT_DIRECTORY}/${test_name}")
             endif()
             add_test(${test_name} ${RUNTIME_OUTPUT_DIRECTORY}/${test_name})
