@@ -13,16 +13,8 @@
 
 #include <dfa/dfa.hpp>
 #include <dfa/dfa_mlir.hpp>
+#include <util/data_file.hpp>
 
-std::string replaceExtension(const std::string& filename, const std::string& oldExtension, const std::string& newExtension) {
-    std::string result = filename;
-    size_t pos = result.rfind(oldExtension);
-
-    if (pos != std::string::npos && pos == result.length() - oldExtension.length()) {
-        result.replace(pos, oldExtension.length(), newExtension);
-    }
-    return result;
-}
 
 int main(int argc, char **argv) {
     using namespace sw::dfa;
@@ -32,6 +24,16 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    std::string dataFileName{};
+    try {
+        dataFileName = generateDataFile(argv[1]);
+		std::cout << "Data file : " << dataFileName << std::endl;
+    }
+	catch (const std::runtime_error& e) {
+		std::cerr << "Error: " << e.what() << std::endl;
+		return 1;
+	}
+
     // Create an MLIR context and register the TOSA dialect.
     mlir::MLIRContext context;
     mlir::DialectRegistry registry;
@@ -40,26 +42,24 @@ int main(int argc, char **argv) {
     context.appendDialectRegistry(registry);
 
     // Parse the provided MLIR file.
-    auto module = mlir::parseSourceFile<mlir::ModuleOp>(argv[1], &context);
+    auto module = mlir::parseSourceFile<mlir::ModuleOp>(dataFileName, &context);
     if (!module) {
-        std::cerr << "Failed to parse MLIR file: " << argv[1] << "\n";
+        std::cerr << "Failed to parse MLIR file: " << dataFileName << "\n";
         return 1;
     }
 
     // Walk through the operations in the module and parse them
-    DomainFlowGraph dfg(argv[1]); // Deep Learning graph
+    DomainFlowGraph dfg(dataFileName); // Deep Learning graph
     processModule(dfg, *module);
 
-    std::string filename = argv[1];
-    std::string dfgFilename = replaceExtension(filename, ".mlir", ".dfg");
-
-    std::cout << "Original filename: " << filename << std::endl;
+    std::string dfgFilename = replaceExtension(dataFileName, ".mlir", ".dfg");
+    std::cout << "Original filename: " << dataFileName << std::endl;
     std::cout << "New filename: " << dfgFilename << std::endl;
 
     dfg.graph.save(dfgFilename);
 
-	// report on the operator statistics
-	reportOperatorStats(dfg);
+    // report on the operator statistics
+    reportOperatorStats(dfg);
 
     reportArithmeticComplexity(dfg);
 	reportNumericalComplexity(dfg);
