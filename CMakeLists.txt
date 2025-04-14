@@ -1,4 +1,12 @@
-cmake_minimum_required(VERSION 3.10)  # Or higher
+cmake_minimum_required(VERSION 3.20)  # Or higher
+
+include(FetchContent)
+FetchContent_Declare(
+    domain_flow
+    GIT_REPOSITORY https://github.com/branes-ai/domain_flow.git
+    GIT_TAG main   # tag, branch, or even commit hash
+)
+FetchContent_MakeAvailable(domain_flow)
 
 ####
 # Set project variables
@@ -100,7 +108,5 @@ add_subdirectory(tools)
 
 # Optional: Install rules (for packaging)
 install(TARGETS ${DFA_TOOL_CLI} DESTINATION bin)
-#install(TARGETS ${DFA_LIBRARY} DESTINATION lib)
-#install(FILES include/dfa/dfa.hpp DESTINATION include) # Install the header, we need to add all the other headers too TBD
 
 
